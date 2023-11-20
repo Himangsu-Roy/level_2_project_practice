@@ -1,6 +1,8 @@
-import { Schema, model, connect } from 'mongoose';
+// import { Schema, model, connect } from 'mongoose';
 
-export type Guardian = {
+import { Model } from 'mongoose';
+
+export type TGuardian = {
   fatherName: string;
   fatherContactNo: string;
   fatherOccupation: string;
@@ -9,33 +11,49 @@ export type Guardian = {
   motherOccupation: string;
 };
 
-export type StudentName = {
+export type TStudentName = {
   firstName: string;
   lastName: string;
   middleName?: string;
 };
 
-export type LocalGuardian = {
+export type TLocalGuardian = {
   name: string;
   occupation: string;
   contactNo: string;
   address: string;
 };
 
-export type Student = {
+export type TStudent = {
   id: string;
-  name: StudentName;
-  gender: 'male' | 'female';
-  dateOfBirth?: Date;
+  password: string;
+  name: TStudentName;
+  gender: 'male' | 'female' | 'other';
+  dateOfBirth?: string;
   contactNo: string;
   emergencyContactNo: string;
   bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   presentAddress: string;
   permanentAddress: string;
-  guardian: Guardian;
+  guardian: TGuardian;
   email: string;
   avatar?: string;
-  localGuardian: LocalGuardian;
+  localGuardian: TLocalGuardian;
   profileImg?: string;
   isActive: 'active' | 'blocked';
+  isDeleted: boolean;
 };
+
+// for creating static function
+export interface StudentModel extends Model<TStudent> {
+  isUserExists(id: string): Promise<TStudent | null>;
+  // isUserExistsByEmail(email: string): Promise<TStudent | null>
+  // isUserExistsByContactNo(contactNo: string): Promise<TStudent | null>
+}
+
+// For Creating instance constructor function
+// export type StudentMethods = {
+//   isUserExists(id: string): Promise<TStudent | null>
+// }
+
+// export type StudentModel = Model<TStudent, Record<string, never>, StudentMethods>;
