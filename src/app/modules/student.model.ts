@@ -10,8 +10,6 @@ import {
   TStudentName,
   StudentModel,
 } from './student/student.interface';
-import { NextFunction } from 'mongoose';
-
 import config from '../config';
 
 const userNameSchema = new Schema<TStudentName>({
@@ -138,24 +136,17 @@ studentSchema.virtual('fullName').get(function (this: TStudent) {
 });
 
 // pre save middleware/hook
-studentSchema.pre(
-  'save' as 'insertMany',
-  function (this: TStudent, next: NextFunction) {
-    // hashing password and save into DB
-    bcrypt.hash(
-      this.password,
-      Number(config.bcrypt_salt_rounds),
-      (err, hash) => {
-        if (err) return next(err);
-        this.password = hash;
-        next();
-      },
-    );
-  },
-);
+studentSchema.pre('save', function (this: TStudent, next) {
+  // hashing password and save into DB
+  bcrypt.hash(this.password, Number(config.bcrypt_salt_rounds), (err, hash) => {
+    if (err) return next(err);
+    this.password = hash;
+    next();
+  });
+});
 
 // post save middleware/hook
-studentSchema.post('save', function (doc, next: NextFunction) {
+studentSchema.post('save', function (doc, next) {
   doc.password = '';
   next();
 });
@@ -184,6 +175,15 @@ studentSchema.statics.isUserExists = async function (id: string) {
   return existingUser;
 };
 
+//update student
+// studentSchema.statics.updateStudent = async function (
+//   id: string,
+//   studentData: TStudent,
+// ) {
+//   const result = await Student.updateOne({ id }, studentData);
+//   return result;
+// };
+
 // studentSchema.method('isUserExists', async function (id: string) {
 //   return await this.model('TStudent').findOne({ id });
 // });
@@ -194,7 +194,7 @@ studentSchema.statics.isUserExists = async function (id: string) {
 //   return existingUser;
 // }
 
-studentSchema.index({ id: 1 }, { unique: true });
+// studentSchema.index({ id: 1 }, { unique: true });
 
 const Student = model<TStudent, StudentModel>('Student', studentSchema);
 

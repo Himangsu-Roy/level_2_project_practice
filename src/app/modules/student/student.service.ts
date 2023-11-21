@@ -36,9 +36,19 @@ const deleteStudentFromDB = async (id: string) => {
   return result;
 };
 
+// update data
+const updateStudentFromDB = async (id: string, studentData: TStudent) => {
+  const result = await Student.updateOne({ id }, studentData);
+  if (result.matchedCount === 0) {
+    throw new Error('User not found');
+  }
+  return result;
+}
+
 export const StudentService = {
   createStudentIntoDB,
   getAllStudentsFromDB,
   getSingleStudentFromDB,
   deleteStudentFromDB,
+  updateStudentFromDB,
 };
