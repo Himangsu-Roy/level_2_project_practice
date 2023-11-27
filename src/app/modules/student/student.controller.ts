@@ -1,53 +1,14 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { StudentService } from './student.service';
 // import studentSchema from './student.validation';
 // import validateStudentModel from './student.validation';
-import studentValidationSchema from './student.validation';
+// import studentValidationSchema from './student.validation';
 
-const createStudent = async (req: Request, res: Response) => {
-  try {
-    // creating a schema validation using zod
-
-    const { student: studentData } = req.body;
-
-    //data validation using zod
-    const studentValidateData = studentValidationSchema.parse(studentData);
-    console.log(studentValidateData);
-
-    // creating a validation schema for joi
-    // data validation using joi
-    // const { error, value } = studentSchema.validate(studentData);
-
-    // will call service function to send this data
-    const result =
-      await StudentService.createStudentIntoDB(studentValidateData);
-
-    // console.log(error, value);
-    // if (error) {
-    //   res.status(400).json({
-    //     success: false,
-    //     message: error.message,
-    //     // message: 'Student not created',
-    //     data: error.details,
-    //   });
-    // }
-
-    res.status(200).json({
-      success: true,
-      message: 'Student created successfully',
-      data: result,
-    });
-  } catch (error: any) {
-    //   console.log(error);
-    res.status(400).json({
-      success: false,
-      message: error.message || 'Student not created',
-      data: error,
-    });
-  }
-};
-
-const getAllStudents = async (req: Request, res: Response) => {
+const getAllStudents = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await StudentService.getAllStudentsFromDB();
     res.status(200).json({
@@ -56,17 +17,21 @@ const getAllStudents = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Student not found',
-      data: error,
-    });
+    // res.status(400).json({
+    //   success: false,
+    //   message: 'Student not found',
+    //   data: error,
+    // });
 
-    console.log(error);
+    next(error);
   }
 };
 
-const getSingleStudent = async (req: Request, res: Response) => {
+const getSingleStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { id } = req.params;
     const result = await StudentService.getSingleStudentFromDB(id);
@@ -76,17 +41,20 @@ const getSingleStudent = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Student not found',
-      data: error,
-    });
-
-    console.log(error);
+    // res.status(400).json({
+    //   success: false,
+    //   message: 'Student not found',
+    //   data: error,
+    // });
+    next(error);
   }
 };
 
-const deleteStudents = async (req: Request, res: Response) => {
+const deleteStudents = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { studentId } = req.params;
     const result = await StudentService.deleteStudentFromDB(studentId);
@@ -96,18 +64,21 @@ const deleteStudents = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Student not found',
-      data: error,
-    });
-
-    console.log(error);
+    // res.status(400).json({
+    //   success: false,
+    //   message: 'Student not found',
+    //   data: error,
+    // });
+    next(error);
   }
 };
 
 // update student
-const updateStudent = async (req: Request, res: Response) => {
+const updateStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { id } = req.params;
     const { student } = req.body;
@@ -118,18 +89,18 @@ const updateStudent = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Student not found',
-      data: error,
-    });
+    // res.status(400).json({
+    //   success: false,
+    //   message: 'Student not found',
+    //   data: error,
+    // });
 
-    console.log(error);
+    next(error);
   }
 };
 
 export const StudentControllers = {
-  createStudent,
+  // createStudent,
   getAllStudents,
   getSingleStudent,
   deleteStudents,

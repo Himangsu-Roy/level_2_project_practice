@@ -1,6 +1,6 @@
 // import { Schema, model, connect } from 'mongoose';
 
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 export type TGuardian = {
   fatherName: string;
@@ -26,6 +26,7 @@ export type TLocalGuardian = {
 
 export type TStudent = {
   id: string;
+  user: Types.ObjectId;
   password: string;
   name: TStudentName;
   gender: 'male' | 'female' | 'other';
@@ -40,16 +41,16 @@ export type TStudent = {
   avatar?: string;
   localGuardian: TLocalGuardian;
   profileImg?: string;
-  isActive: 'active' | 'blocked';
+  // isActive: 'active' | 'blocked';
   isDeleted: boolean;
 };
 
 // for creating static function
-export interface StudentModel extends Model<TStudent> {
+export type StudentModel = {
   isUserExists(id: string): Promise<TStudent | null>;
   // isUserExistsByEmail(email: string): Promise<TStudent | null>
   // isUserExistsByContactNo(contactNo: string): Promise<TStudent | null>
-}
+} & Model<TStudent>
 
 // For Creating instance constructor function
 // export type StudentMethods = {
