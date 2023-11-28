@@ -1,6 +1,5 @@
 import { Schema, model } from 'mongoose';
 import validator from 'validator';
-import bcrypt from 'bcrypt';
 
 import {
   TGuardian,
@@ -9,7 +8,6 @@ import {
   TStudentName,
   StudentModel,
 } from './student.interface';
-import config from '../../config';
 
 const userNameSchema = new Schema<TStudentName>({
   firstName: {
@@ -88,7 +86,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       },
       required: true,
     },
-    dateOfBirth: { type: String },
+    dateOfBirth: { type: Date },
     contactNo: { type: String, required: true },
     emergencyContactNo: { type: String, required: true },
     email: {
