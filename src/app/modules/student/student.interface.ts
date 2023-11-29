@@ -30,7 +30,7 @@ export type TStudent = {
   password: string;
   name: TStudentName;
   gender: 'male' | 'female' | 'other';
-  dateOfBirth?: Date;
+  dateOfBirth?: string;
   contactNo: string;
   emergencyContactNo: string;
   bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
@@ -41,6 +41,7 @@ export type TStudent = {
   avatar?: string;
   localGuardian: TLocalGuardian;
   profileImg?: string;
+  addmissionSemester: Types.ObjectId;
   // isActive: 'active' | 'blocked';
   isDeleted: boolean;
 };

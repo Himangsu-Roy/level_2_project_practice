@@ -72,7 +72,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       unique: true,
       required: [true, 'id is required'],
     },
-   
+
     name: {
       type: userNameSchema,
       required: true,
@@ -86,7 +86,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       },
       required: true,
     },
-    dateOfBirth: { type: Date },
+    dateOfBirth: { type: String },
     contactNo: { type: String, required: true },
     emergencyContactNo: { type: String, required: true },
     email: {
@@ -114,6 +114,11 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: true,
     },
     profileImg: { type: String },
+    addmissionSemester: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicSemester',
+      required: true,
+    },
     // isActive: {
     //   type: String,
     //   enum: ['active', 'blocked'],
@@ -132,8 +137,6 @@ const studentSchema = new Schema<TStudent, StudentModel>(
 studentSchema.virtual('fullName').get(function (this: TStudent) {
   return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
 });
-
-
 
 // Query Middleware
 studentSchema.pre('find', function (next) {

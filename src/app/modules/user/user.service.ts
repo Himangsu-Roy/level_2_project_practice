@@ -1,14 +1,12 @@
 import config from '../../config';
+import AcademicSemester from '../academicSemester/academicSemester.model';
 import { TStudent } from '../student/student.interface';
 import Student from '../student/student.model';
 import { TUser } from './user.interface';
 import User from './user.model';
+import { genarateStudentId } from './user.utils';
 
-const createStudentIntoDB = async (password: string, studentData: TStudent) => {
-  //   if (await Student.isUserExists(studentData.id)) {
-  //     throw new Error('User already exists');
-  //   }
-
+const createStudentIntoDB = async (password: string, payload: TStudent) => {
   // create a user object
   const userData: Partial<TUser> = {};
 
@@ -23,8 +21,13 @@ const createStudentIntoDB = async (password: string, studentData: TStudent) => {
   //set student role
   userData.role = 'student';
 
+  // find academic semester info
+  const academicSemester = await AcademicSemester.findById(
+    payload.addmissionSemester,
+  );
+
   //set manually genarated id
-  userData.id = '2030100001';
+  userData.id = await genarateStudentId(academicSemester);
 
   // create a user
   //Static data create
@@ -33,22 +36,13 @@ const createStudentIntoDB = async (password: string, studentData: TStudent) => {
   //create a student
   if (Object.keys(newUser).length) {
     // set id, _id as user
-    studentData.id = newUser.id; // embaded id
-    studentData.user = newUser._id; // reference _id
+    payload.id = newUser.id; // embaded id
+    payload.user = newUser._id; // reference _id
 
-    const newStudent = await Student.create(studentData);
+    const newStudent = await Student.create(payload);
 
     return newStudent;
   }
-
-  // create a instance function
-  // const student = new Student(studentData); // create an instance
-
-  // if (await student.isUserExists(studentData.id)) {
-  //   throw new Error('User already exists');
-  // }
-
-  // const result = await student.save(); // built in instance method
 };
 
 export const UserServices = { createStudentIntoDB };
