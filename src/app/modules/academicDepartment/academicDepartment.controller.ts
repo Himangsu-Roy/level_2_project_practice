@@ -4,11 +4,9 @@ import sendResponse from '../../utils/sendResponse';
 import { AcademicDepartmentService } from './academicDepartment.service';
 
 const createAcademicDepartment = catchAsync(async (req, res) => {
-  const { academicDepartment } = req.body;
-  const result =
-    await AcademicDepartmentService.createAcademicDepartmentIntoDB(
-      academicDepartment,
-    );
+  const result = await AcademicDepartmentService.createAcademicDepartmentIntoDB(
+    req.body,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -47,10 +45,10 @@ const getSingleAcademicDepartment = catchAsync(async (req, res) => {
 
 const updateAcademicDepartment = catchAsync(async (req, res) => {
   const { departmentId } = req.params;
-  const { academicDepartment } = req.body;
+
   const result = await AcademicDepartmentService.updateAcademicDepartmentIntoDB(
     departmentId,
-    academicDepartment,
+    req.body,
   );
 
   sendResponse(res, {

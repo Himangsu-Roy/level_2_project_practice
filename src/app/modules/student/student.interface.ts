@@ -44,6 +44,7 @@ export type TStudent = {
   addmissionSemester: Types.ObjectId;
   // isActive: 'active' | 'blocked';
   isDeleted: boolean;
+  academicDepartment: Types.ObjectId;
 };
 
 // for creating static function
