@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import validator from 'validator';
+// import validator from 'validator';
 
 import {
   TGuardian,
@@ -16,13 +16,13 @@ const userNameSchema = new Schema<TStudentName>({
     // minLength: [2, 'First Name must be at least 2 characters long'],
     maxLength: [20, 'First Name must be at most 20 characters long'],
     trim: true,
-    validate: {
-      validator: function (value: string) {
-        const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1);
-        return firstNameStr === value;
-      },
-      message: 'First Name must be in cappitalize',
-    },
+    // validate: {
+    //   validator: function (value: string) {
+    //     const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1);
+    //     return firstNameStr === value;
+    //   },
+    //   message: 'First Name must be in cappitalize',
+    // },
   },
   middleName: {
     type: String,
@@ -32,10 +32,10 @@ const userNameSchema = new Schema<TStudentName>({
     type: String,
     trim: true,
     required: [true, 'Last Name is required'],
-    validate: {
-      validator: (value: string) => validator.isAlpha(value),
-      message: 'Last Name must be alpha',
-    },
+    // validate: {
+    //   validator: (value: string) => validator.isAlpha(value),
+    //   message: 'Last Name must be alpha',
+    // },
   },
 });
 
@@ -93,11 +93,11 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       type: String,
       required: true,
       unique: true,
-      validate: {
-        validator: (value: string) => validator.isEmail(value),
-        message: 'Invalid email',
-        // message: "The email field must be a valid email address.",
-      },
+      // validate: {
+      //   validator: (value: string) => validator.isEmail(value),
+      //   message: 'Invalid email',
+      //   // message: "The email field must be a valid email address.",
+      // },
     },
     bloodGroup: {
       type: String,

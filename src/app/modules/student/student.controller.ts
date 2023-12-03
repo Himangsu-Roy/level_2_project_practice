@@ -6,8 +6,6 @@ import catchAsync from '../../utils/catchAsync';
 // import validateStudentModel from './student.validation';
 // import studentValidationSchema from './student.validation';
 
-
-
 const getAllStudents = catchAsync(async (req, res) => {
   const result = await StudentService.getAllStudentsFromDB();
   sendResponse(res, {
@@ -43,9 +41,11 @@ const deleteStudents = catchAsync(async (req, res) => {
 
 // update student
 const updateStudent = catchAsync(async (req, res) => {
-  const { id } = req.params;
+  const { studentId } = req.params;
   const { student } = req.body;
-  const result = await StudentService.updateStudentFromDB(id, student);
+  // console.log(student)
+
+  const result = await StudentService.updateStudentIntoDB(studentId, student);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

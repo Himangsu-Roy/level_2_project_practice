@@ -1,11 +1,12 @@
 import { Schema, model } from 'mongoose';
 import { TAcademicDepartment } from './academicDepartment.interface';
+import AppError from '../../errors/AppError';
 
 const academicDepartmentSchema = new Schema<TAcademicDepartment>(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, 'Please provide department name'],
       unique: true,
     },
 
