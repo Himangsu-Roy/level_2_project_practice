@@ -21,9 +21,16 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
 });
 
-
 // global error handler
 app.use(globalErrorHandler);
+
+// unhandle Rejection test
+// const test = async (req: Request, res: Response) => {
+//   Promise.reject();
+// };
+
+// app.get('/', test); 
+
 
 // Not Found router
 // app.use('*', (req: Request, res: Response, next: NextFunction) => {
@@ -36,6 +43,6 @@ app.use(globalErrorHandler);
 //     },
 //   });
 // });
-app.use(notFound)
+app.use(notFound);
 
 export default app;
