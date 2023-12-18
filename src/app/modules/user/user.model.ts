@@ -1,10 +1,10 @@
 import { Schema, model } from 'mongoose';
-import { TUser } from './user.interface';
+import { TUser, UserModel } from './user.interface';
 import bcrypt from 'bcrypt';
 import config from '../../config';
+import { number } from 'joi';
 
-
-const userSchema = new Schema<TUser>(
+const userSchema = new Schema<TUser, UserModel>(
   {
     id: {
       type: String,
@@ -27,7 +27,7 @@ const userSchema = new Schema<TUser>(
     },
     status: {
       type: String,
-      enum: ['in-progress', 'block'],
+      enum: ['in-progress', 'blocked'],
       default: 'in-progress',
     },
     isDeleted: {
@@ -56,6 +56,22 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-const User = model<TUser>('User', userSchema);
+userSchema.statics.isUserExistsByCustomId = async (id: string) => {
+  return await User.findOne({ id });
+};
+
+userSchema.statics.isPasswordMatched = async function (
+  palinTextPassword,
+  hashedPassword,
+) {
+  return await bcrypt.compare(palinTextPassword, hashedPassword);
+};
+
+userSchema.statics.isJWTIssuedBeforePasswordChanged = async ( passwordChangedTimestamp: Date,
+    jwtIssuedTimestamp: number) => {
+ return passwordChangedTimestamp.getTime() > jwtIssuedTimestamp;
+}
+
+const User = model<TUser, UserModel>('User', userSchema);
 
 export default User;

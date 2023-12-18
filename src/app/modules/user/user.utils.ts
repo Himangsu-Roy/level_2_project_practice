@@ -14,7 +14,7 @@ const findLastStudentId = async () => {
 };
 
 // year semesterCode 4 digit number
-export const genarateStudentId = async (payload: TAcademicSemester) => {
+export const genarateStudentId = async (payload: TAcademicSemester | null) => {
   // first time 0000
   let currentId = (0).toString();
 
