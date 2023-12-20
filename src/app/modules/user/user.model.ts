@@ -11,6 +11,11 @@ const userSchema = new Schema<TUser, UserModel>(
       required: true,
       unique: true,
     },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     password: {
       type: String,
       required: [true, 'password is required'],
@@ -76,7 +81,7 @@ userSchema.statics.isJWTIssuedBeforePasswordChanged = async (
   jwtIssuedTimestamp: number,
 ) => {
   const passwordChangedTime = new Date(passwordChangedTimestamp).getTime() / 1000;
-  return passwordChangedTimestamp.getTime() > jwtIssuedTimestamp;
+  return passwordChangedTime > jwtIssuedTimestamp;
 };
 
 const User = model<TUser, UserModel>('User', userSchema);
