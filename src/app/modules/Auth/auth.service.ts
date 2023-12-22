@@ -5,8 +5,9 @@ import config from '../../config';
 import AppError from '../../errors/AppError';
 
 import { TLoginUser } from './auth.interface';
-import { createToken } from './auth.utils';
+import { createToken, verifyToken } from './auth.utils';
 import User from '../user/user.model';
+import { sendMail } from '../../utils/sendEmail';
 
 const loginUser = async (payload: TLoginUser) => {
   // checking if the user is exist
@@ -116,10 +117,9 @@ const changePassword = async (
 
 const refreshToken = async (token: string) => {
   // checking if the given token is valid
-  const decoded = jwt.verify(
-    token,
-    config.jwt_refresh_secret as string,
-  ) as JwtPayload;
+  const decoded = verifyToken(token, config.jwt_refresh_secret as string) as JwtPayload;
+
+  console.log(decoded)
 
   const { userId, iat } = decoded;
 
@@ -198,10 +198,70 @@ const forgetPassword = async (userId: string) => {
     '10m',
   );
 
-  const resetUILink = `http://localhost:3000?id=${user?.id}&token=${resetToken}`;
-  return {
-    resetUILink,
-  };
+  const text = 'Reset password within 10 minutes';
+  const resetUILink = `${config.reset_pass_ui_link}?id=${user?.id}&token=${resetToken}`;
+  sendMail(user?.email, 'Reset Password', resetUILink);
+};
+
+const resetPassword = async (
+  payload: { id: string; newPassword: string },
+  token: string,
+) => {
+  // checking if the user is exist
+  const user = await User.isUserExistsByCustomId(payload?.id);
+
+  if (!user) {
+    throw new AppError('This user is not found !', httpStatus.NOT_FOUND);
+  }
+  // checking if the user is already deleted
+  const isDeleted = user?.isDeleted;
+
+  if (isDeleted) {
+    throw new AppError('This user is deleted !', httpStatus.FORBIDDEN);
+  }
+
+  // checking if the user is blocked
+  const userStatus = user?.status;
+
+  if (userStatus === 'blocked') {
+    throw new AppError('This user is blocked ! !', httpStatus.FORBIDDEN);
+  }
+
+  const decoded = jwt.verify(
+    token,
+    config.jwt_access_secret as string,
+  ) as JwtPayload;
+
+  if (payload.id !== decoded.userId) {
+    throw new AppError('You are not authorized !', httpStatus.UNAUTHORIZED);
+  }
+
+  //checking if the password is correct
+  // if (user.needsPasswordChange) {
+  //   throw new AppError(
+  //     'You need to change your password first !',
+  //     httpStatus.FORBIDDEN,
+  //   );
+  // }
+
+  //hash new password
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  await User.findOneAndUpdate(
+    {
+      id: payload?.id,
+      role: user?.role,
+    },
+    {
+      password: newHashedPassword,
+      needsPasswordChange: false,
+      passwordChangedAt: new Date(),
+    },
+  );
+  return null;
 };
 
 export const AuthServices = {
@@ -209,4 +269,5 @@ export const AuthServices = {
   changePassword,
   refreshToken,
   forgetPassword,
+  resetPassword,
 };
