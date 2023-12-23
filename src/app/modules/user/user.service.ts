@@ -15,8 +15,13 @@ import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import { Faculty } from '../Faculty/faculty.model';
 import { Admin } from '../Admin/admin.model';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
-const createStudentIntoDB = async (password: string, payload: TStudent) => {
+const createStudentIntoDB = async (
+  file: any,
+  password: string,
+  payload: TStudent,
+) => {
   // create a user object
   const userData: Partial<TUser> = {};
 
@@ -43,6 +48,11 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     session.startTransaction();
     userData.id = await genarateStudentId(admissionSemester);
 
+    const imageName = `${userData?.id}${payload?.name?.firstName}`;
+    const path = file?.path;
+    //send image to cloudinary
+    const { secure_url } = await sendImageToCloudinary(imageName, path);
+
     // create a user(transaction-1)
     //Static data create
     const newUser = await User.create([userData], { session });
@@ -54,9 +64,11 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     // set id, _id as user
     payload.id = newUser[0].id; // embaded id
     payload.user = newUser[0]._id; // reference _id
+    payload.profileImg = secure_url;
 
     // create a student(transaction-2)
     const newStudent = await Student.create([payload], { session });
+
     if (!newStudent.length) {
       throw new AppError('Student not created', httpStatus.BAD_REQUEST);
     }
@@ -194,16 +206,16 @@ const changeStatus = async (id: string, status: string) => {
 
 const getMe = async (userId: string, role: string) => {
   if (role === 'admin') {
-    const result = await Admin.findOne({ id: userId }).populate("user");
+    const result = await Admin.findOne({ id: userId }).populate('user');
     return result;
   } else if (role === 'faculty') {
-    const result = await Faculty.findOne({ id: userId }).populate("user");
+    const result = await Faculty.findOne({ id: userId }).populate('user');
     return result;
   } else if (role === 'student') {
-    const result = await Student.findOne({ id: userId }).populate("user");
+    const result = await Student.findOne({ id: userId }).populate('user');
     return result;
   }
-}
+};
 
 export const UserServices = {
   createStudentIntoDB,
