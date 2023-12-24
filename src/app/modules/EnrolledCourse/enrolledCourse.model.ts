@@ -1,27 +1,116 @@
-import { Types } from "mongoose";
+import { Schema, model } from 'mongoose';
+import {
+  TEnrolledCourse,
+  TEnrolledCourseMarks,
+} from './enrolledCourse.interface';
+import { Grade } from './enrolledCourse.constant';
 
+const courseMarksSchema = new Schema<TEnrolledCourseMarks>(
+  {
+    classTest1: {
+      type: Number,
+      min: 0,
+      max: 10,
+      default: 0,
+    },
+    midTerm: {
+      type: Number,
+      min: 0,
+      max: 30,
+      default: 0,
+    },
+    classTest2: {
+      type: Number,
+      min: 0,
+      max: 10,
+      default: 0,
+    },
+    finalTerm: {
+      type: Number,
+      min: 0,
+      max: 50,
+      default: 0,
+    },
+  },
+  {
+    _id: false,
+  },
+);
 
-export type TGrade = "A" | "B" | "C" | "D" | "E" | "F" | "NA";
+const enrolledCourseSchema = new Schema<TEnrolledCourse>({
+  semesterRegistration: {
+    type: Schema.Types.ObjectId,
+    ref: 'SemesterRegistration',
+    required: true,
+  },
+  academicSemester: {
+    type: Schema.Types.ObjectId,
+    ref: 'AcademicSemester',
+    required: true,
+  },
+  academicFaculty: {
+    type: Schema.Types.ObjectId,
+    ref: 'AcademicFaculty',
+    required: true,
+  },
+  academicDepartment: {
+    type: Schema.Types.ObjectId,
+    ref: 'AcademicDepartment',
+    required: true,
+  },
+  offeredCourse: {
+    type: Schema.Types.ObjectId,
+    ref: 'OfferedCourse',
+    required: true,
+  },
+  course: {
+    type: Schema.Types.ObjectId,
+    ref: 'Course',
+    required: true,
+  },
+  student: {
+    type: Schema.Types.ObjectId,
+    ref: 'Student',
+    required: true,
+  },
+  faculty: {
+    type: Schema.Types.ObjectId,
+    ref: 'Faculty',
+    required: true,
+  },
+  isEnrolled: {
+    type: Boolean,
+    default: false,
+  },
+  courseMarks: {
+    type: courseMarksSchema,
+    default: {
+      classTest1: 0,
+      midTerm: 0,
+      classTest2: 0,
+      finalTerm: 0,
+    },
+  },
+  grade: {
+    type: String,
+    enum: Grade,
+    default: null,
+  },
+  gradePoints: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 4,
+  },
+  isCompleted: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-export type TEnrolledCourseMarks = {
-    classTest1: number;
-    midTerm: number;
-    classTest2: number;
-    finalTerm: number;
-}
+const EnrolledCourse = model<TEnrolledCourse>(
+  'EnrolledCourse',
+  enrolledCourseSchema,
+);
 
-export type TEnrolledCourse = {
-    semesterRegistration: Types.ObjectId;
-    course: Types.ObjectId;
-    academicSemester: Types.ObjectId;
-    academicFaculty: Types.ObjectId;
-    academicDepartment: Types.ObjectId;
-    offeredCourse: Types.ObjectId;
-    student: Types.ObjectId;
-    faculty: Types.ObjectId;
-    courseMarks: TEnrolledCourseMarks;
-    isEnrolled: boolean;
-    grade: TGrade;
-    gradePoints: number;
-    isCompleted: boolean;
-}
+export default EnrolledCourse;
