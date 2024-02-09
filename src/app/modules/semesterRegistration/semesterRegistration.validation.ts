@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { SemesterRegistrationStatus } from "./semesterRegistration.constant";
+import { z } from 'zod';
+import { SemesterRegistrationStatus } from './semesterRegistration.constant';
 
 const createSemesterRegistrationValidationSchema = z.object({
   body: z.object({

@@ -51,24 +51,22 @@ const refreshToken = catchAsync(async (req, res) => {
 const forgetPassword = catchAsync(async (req, res) => {
   const userId = req.body.id;
   const result = await AuthServices.forgetPassword(userId);
-
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Password reset link is sent to your email!',
+    message: 'Reset link is generated succesfully!',
     data: result,
   });
 });
 
 const resetPassword = catchAsync(async (req, res) => {
-  // const { ...passwordData } = req.body;
-  const token = req.headers.authorization as string;
-  const result = await AuthServices.resetPassword(req.body, token);
+  const token = req.headers.authorization;
 
+  const result = await AuthServices.resetPassword(req.body, token as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Password is updated succesfully!',
+    message: 'Password reset succesful!',
     data: result,
   });
 });

@@ -1,18 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
 import { AnyZodObject } from 'zod';
-// make higher order function for guard route
+import catchAsync from '../utils/catchAsync';
+
 const validateRequest = (schema: AnyZodObject) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      await schema.parseAsync({
-        body: req.body,
-        cookies: req.cookies,
-      });
-      return next();
-    } catch (error) {
-      return next(error);
-    }
-  };
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    await schema.parseAsync({
+      body: req.body,
+      cookies: req.cookies,
+    });
+
+    next();
+  });
 };
 
 export default validateRequest;

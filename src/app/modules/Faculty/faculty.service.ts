@@ -3,12 +3,10 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
-// import { User } from '../user/user.model';
+import { User } from '../user/user.model';
 import { FacultySearchableFields } from './faculty.constant';
-// import { TFaculty } from './faculty.interface';
+import { TFaculty } from './faculty.interface';
 import { Faculty } from './faculty.model';
-import { TFaculty } from './faculty.interfce';
-import User from '../user/user.model';
 
 const getAllFacultiesFromDB = async (query: Record<string, unknown>) => {
   const facultyQuery = new QueryBuilder(
@@ -19,7 +17,7 @@ const getAllFacultiesFromDB = async (query: Record<string, unknown>) => {
     .filter()
     .sort()
     .paginate()
-    .limitFields();
+    .fields();
 
   const result = await facultyQuery.modelQuery;
   return result;
@@ -64,7 +62,7 @@ const deleteFacultyFromDB = async (id: string) => {
     );
 
     if (!deletedFaculty) {
-      throw new AppError('Failed to delete faculty', httpStatus.BAD_REQUEST);
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete faculty');
     }
 
     // get user _id from deletedFaculty
@@ -77,7 +75,7 @@ const deleteFacultyFromDB = async (id: string) => {
     );
 
     if (!deletedUser) {
-      throw new AppError('Failed to delete user', httpStatus.BAD_REQUEST);
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
     }
 
     await session.commitTransaction();

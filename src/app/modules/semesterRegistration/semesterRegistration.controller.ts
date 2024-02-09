@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import { SemesterRegistrationService } from "./semesterRegistration.service";
-import httpStatus from "http-status";
+import { Request, Response } from 'express';
+import httpStatus from 'http-status';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
+import { SemesterRegistrationService } from './semesterRegistration.service';
 
 const createSemesterRegistration = catchAsync(
   async (req: Request, res: Response) => {
@@ -20,7 +20,6 @@ const createSemesterRegistration = catchAsync(
   },
 );
 
-
 const getAllSemesterRegistrations = catchAsync(
   async (req: Request, res: Response) => {
     const result =
@@ -36,7 +35,6 @@ const getAllSemesterRegistrations = catchAsync(
     });
   },
 );
-
 
 const getSingleSemesterRegistration = catchAsync(
   async (req: Request, res: Response) => {
@@ -73,7 +71,6 @@ const updateSemesterRegistration = catchAsync(
     });
   },
 );
-
 
 const deleteSemesterRegistration = catchAsync(
   async (req: Request, res: Response) => {

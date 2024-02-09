@@ -1,20 +1,23 @@
 import { Router } from 'express';
+import { AdminRoutes } from '../modules/Admin/admin.route';
+import { AuthRoutes } from '../modules/Auth/auth.route';
+import { CourseRoutes } from '../modules/Course/course.route';
+
+import { EnrolledCourseRoutes } from '../modules/EnrolledCourse/enrolledCourse.route';
+import { FacultyRoutes } from '../modules/Faculty/faculty.route';
+import { offeredCourseRoutes } from '../modules/OfferedCourse/OfferedCourse.route';
+import { AcademicDepartmentRoutes } from '../modules/academicDepartment/academicDepartment.route';
+import { AcademicFacultyRoutes } from '../modules/academicFaculty/academicFaculty.route';
+import { AcademicSemesterRoutes } from '../modules/academicSemester/academicSemester.route';
+import { semesterRegistrationRoutes } from '../modules/semesterRegistration/semesterRegistration.route';
 import { StudentRoutes } from '../modules/student/student.route';
 import { UserRoutes } from '../modules/user/user.route';
-import { AcademicSemesterRoutes } from '../modules/academicSemester/academicSemester.route';
-import { AcademicFacultyRoutes } from '../modules/academicFaculty/academicFaculty.route';
-import { AcademicDepartmentRoutes } from '../modules/academicDepartment/academicDepartment.route';
-import { CourseRoutes } from '../modules/course/course.route';
-import { semesterRegistrationRoutes } from '../modules/semesterRegistration/semesterRegistration.route';
-import { offeredCourseRoutes } from '../modules/OfferedCourse/OfferedCourse.route';
-import { FacultyRoutes } from '../modules/Faculty/faculty.route';
-import { AdminRoutes } from '../modules/Admin/admin.route';
-import { AuthRoutes } from '../modules/Auth/auth.router';
+
 const router = Router();
 
 const moduleRoutes = [
   {
-    path: '/user',
+    path: '/users',
     route: UserRoutes,
   },
   {
@@ -57,13 +60,12 @@ const moduleRoutes = [
     path: '/auth',
     route: AuthRoutes,
   },
+  {
+    path: '/enrolled-courses',
+    route: EnrolledCourseRoutes,
+  },
 ];
 
-moduleRoutes.forEach((route) => {
-  router.use(route.path, route.route);
-});
-
-// router.use("/user", UserRoutes)
-// router.use('/students', StudentRoutes)
+moduleRoutes.forEach((route) => router.use(route.path, route.route));
 
 export default router;

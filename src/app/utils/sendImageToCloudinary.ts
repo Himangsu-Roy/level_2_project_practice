@@ -1,133 +1,38 @@
 import { v2 as cloudinary } from 'cloudinary';
-import config from '../config';
-import multer from 'multer';
 import fs from 'fs';
+import multer from 'multer';
+import config from '../config';
 
-export const sendImageToCloudinary = (imageName: string, path: string) => {
-  cloudinary.config({
-    cloud_name: config.cloudinary_name,
-    api_key: config.cloudinary_api_key,
-    api_secret: config.cloudinary_api_secret,
-    secure: true,
-  });
+cloudinary.config({
+  cloud_name: config.cloudinary_cloud_name,
+  api_key: config.cloudinary_api_key,
+  api_secret: config.cloudinary_api_secret,
+});
 
-  //   return cloudinary.uploader.upload(
-  //     path,
-  //     {
-  //       public_id: imageName,
-  //       use_filename: true,
-  //       unique_filename: false,
-  //       overwrite: true,
-  //       resource_type: 'image',
-  //       //   format: 'jpg',
-  //       quality: 'auto',
-  //       eager: [
-  //         {
-  //           width: 300,
-  //           height: 300,
-  //           crop: 'fill',
-  //           //   gravity: 'face',
-  //           //   radius: 'max',
-  //           //   effect: 'sepia',
-  //           //   quality: 'auto',
-  //           //   format: 'jpg',
-  //           //   fetch_format: 'auto',
-  //           //   type: 'fetch',
-  //           //   background: 'rgb:ffffff',
-  //         },
-  //       ],
-  //     },
-  //     (error, result) => {
-  //       if (error) {
-  //         console.log(error);
-  //       }
-  //       console.log(result);
-  //     },
-  //   );
-
-  // return new Promise((resolve, reject) => {
-  //   cloudinary.uploader.upload(
-  //     path,
-  //     {
-  //       public_id: imageName,
-  //       use_filename: true,
-  //       unique_filename: false,
-  //       overwrite: true,
-  //       resource_type: 'image',
-  //     },
-  //     (error, result) => {
-  //       if (error) {
-  //         reject(error);
-  //       }
-  //       resolve(result);
-  //     },
-  //   );
-
-  //   // delete a file after uploading to cloudinary
-  //   fs.unlink(path, (err) => {
-  //     if (err) {
-  //       console.error(err);
-  //     } else {
-  //       console.log('File deleted!');
-  //     }
-  //   });
-  // });
-
-  // return cloudinary.uploader.upload(path, {
-  //   public_id: imageName,
-  //   use_filename: true,
-  //   unique_filename: false,
-  //   overwrite: true,
-  //   resource_type: 'image',
-  //   eager: [
-  //     {
-  //       width: 300,
-  //       height: 300,
-  //       crop: 'fill',
-  //     },
-  //   ],
-  // });
-
-  // delete a file after uploading to cloudinary
-  //   fs.unlink(path, (err) => {
-  //     if (err) {
-  //       console.error(err);
-  //     } else {
-  //       console.log('File deleted!');
-  //     }
-  //   });
-
-  return cloudinary.uploader.upload(
-    path,
-    {
-      public_id: imageName,
-      use_filename: true,
-      unique_filename: false,
-      overwrite: true,
-      resource_type: 'image',
-      eager: [
-        {
-          width: 300,
-          height: 300,
-          crop: 'fill',
-        },
-      ],
-    },
-    (error, result) => {
-      if (error) {
-        console.log(error);
-      }
-      // delete a file after uploading to cloudinary
-      fs.unlink(path, (err) => {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log('File deleted!');
+export const sendImageToCloudinary = (
+  imageName: string,
+  path: string,
+): Promise<Record<string, unknown>> => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload(
+      path,
+      { public_id: imageName.trim() },
+      function (error, result) {
+        if (error) {
+          reject(error);
         }
-      });
-      console.log(result);
-    },
-  );
+        resolve(result);
+        // delete a file asynchronously
+        fs.unlink(path, (err) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('File is deleted.');
+          }
+        });
+      },
+    );
+  });
 };
 
 const storage = multer.diskStorage({

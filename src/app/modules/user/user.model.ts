@@ -1,9 +1,9 @@
-import { Schema, model } from 'mongoose';
-import { TUser, UserModel } from './user.interface';
+/* eslint-disable @typescript-eslint/no-this-alias */
 import bcrypt from 'bcrypt';
+import { Schema, model } from 'mongoose';
 import config from '../../config';
-import { number } from 'joi';
-
+import { UserStatus } from './user.constant';
+import { TUser, UserModel } from './user.interface';
 const userSchema = new Schema<TUser, UserModel>(
   {
     id: {
@@ -18,10 +18,8 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     password: {
       type: String,
-      required: [true, 'password is required'],
-      maxlength: [20, 'password must be at most 20 characters long'],
+      required: true,
       select: 0,
-      // required: [true, 'id is required']
     },
     needsPasswordChange: {
       type: Boolean,
@@ -32,11 +30,11 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     role: {
       type: String,
-      enum: ['admin', 'student', 'faculty'],
+      enum: ['superAdmin', 'student', 'faculty', 'admin'],
     },
     status: {
       type: String,
-      enum: ['in-progress', 'blocked'],
+      enum: UserStatus,
       default: 'in-progress',
     },
     isDeleted: {
@@ -49,41 +47,43 @@ const userSchema = new Schema<TUser, UserModel>(
   },
 );
 
-// pre save middleware/hook
-userSchema.pre('save', function (this: TUser, next) {
+userSchema.pre('save', async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this; // doc
   // hashing password and save into DB
-  bcrypt.hash(this.password, Number(config.bcrypt_salt_rounds), (err, hash) => {
-    if (err) return next(err);
-    this.password = hash;
-    next();
-  });
+
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  next();
 });
 
-// post save middleware/hook
+// set '' after saving password
 userSchema.post('save', function (doc, next) {
   doc.password = '';
   next();
 });
 
-userSchema.statics.isUserExistsByCustomId = async (id: string) => {
-  return await User.findOne({ id }).select("+password");
+userSchema.statics.isUserExistsByCustomId = async function (id: string) {
+  return await User.findOne({ id }).select('+password');
 };
 
 userSchema.statics.isPasswordMatched = async function (
-  palinTextPassword,
+  plainTextPassword,
   hashedPassword,
 ) {
-  return await bcrypt.compare(palinTextPassword, hashedPassword);
+  return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
-userSchema.statics.isJWTIssuedBeforePasswordChanged = async (
+userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
   passwordChangedTimestamp: Date,
   jwtIssuedTimestamp: number,
-) => {
-  const passwordChangedTime = new Date(passwordChangedTimestamp).getTime() / 1000;
+) {
+  const passwordChangedTime =
+    new Date(passwordChangedTimestamp).getTime() / 1000;
   return passwordChangedTime > jwtIssuedTimestamp;
 };
 
-const User = model<TUser, UserModel>('User', userSchema);
-
-export default User;
+export const User = model<TUser, UserModel>('User', userSchema);

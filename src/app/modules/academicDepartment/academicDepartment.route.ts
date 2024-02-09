@@ -1,27 +1,31 @@
 import express from 'express';
-import { AcademicDepartmentController } from './academicDepartment.controller';
 import validateRequest from '../../middlewares/validateRequest';
+import { AcademicDepartmentControllers } from './academicDepartment.controller';
 import { AcademicDepartmentValidation } from './academicDepartment.validation';
+
 const router = express.Router();
 
 router.post(
   '/create-academic-department',
-  validateRequest(
-    AcademicDepartmentValidation.createAcademicDepartmentValidationSchema,
-  ),
-  AcademicDepartmentController.createAcademicDepartment,
+  // validateRequest(
+  //   AcademicDepartmentValidation.createAcademicDepartmentValidationSchema,
+  // ),
+  AcademicDepartmentControllers.createAcademicDepartmemt,
 );
+
 router.get(
   '/:departmentId',
-  AcademicDepartmentController.getSingleAcademicDepartment,
+  AcademicDepartmentControllers.getSingleAcademicDepartment,
 );
-router.get('/', AcademicDepartmentController.getAllAcademicDepartments);
+
 router.patch(
   '/:departmentId',
   validateRequest(
     AcademicDepartmentValidation.updateAcademicDepartmentValidationSchema,
   ),
-  AcademicDepartmentController.updateAcademicDepartment,
+  AcademicDepartmentControllers.updateAcademicDeartment,
 );
+
+router.get('/', AcademicDepartmentControllers.getAllAcademicDepartments);
 
 export const AcademicDepartmentRoutes = router;

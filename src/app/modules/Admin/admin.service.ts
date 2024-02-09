@@ -3,10 +3,10 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
+import { User } from '../user/user.model';
 import { AdminSearchableFields } from './admin.constant';
 import { TAdmin } from './admin.interface';
 import { Admin } from './admin.model';
-import User from '../user/user.model';
 
 const getAllAdminsFromDB = async (query: Record<string, unknown>) => {
   const adminQuery = new QueryBuilder(Admin.find(), query)
@@ -14,7 +14,7 @@ const getAllAdminsFromDB = async (query: Record<string, unknown>) => {
     .filter()
     .sort()
     .paginate()
-    .limitFields();
+    .fields();
 
   const result = await adminQuery.modelQuery;
   return result;
@@ -58,7 +58,7 @@ const deleteAdminFromDB = async (id: string) => {
     );
 
     if (!deletedAdmin) {
-      throw new AppError('Failed to delete student', httpStatus.BAD_REQUEST);
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete student');
     }
 
     // get user _id from deletedAdmin
@@ -71,7 +71,7 @@ const deleteAdminFromDB = async (id: string) => {
     );
 
     if (!deletedUser) {
-      throw new AppError('Failed to delete user', httpStatus.BAD_REQUEST);
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
     }
 
     await session.commitTransaction();

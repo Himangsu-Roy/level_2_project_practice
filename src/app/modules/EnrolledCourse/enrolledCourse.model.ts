@@ -1,9 +1,9 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { Grade } from './enrolledCourse.constant';
 import {
   TEnrolledCourse,
   TEnrolledCourseMarks,
 } from './enrolledCourse.interface';
-import { Grade } from './enrolledCourse.constant';
 
 const courseMarksSchema = new Schema<TEnrolledCourseMarks>(
   {
@@ -84,23 +84,18 @@ const enrolledCourseSchema = new Schema<TEnrolledCourse>({
   },
   courseMarks: {
     type: courseMarksSchema,
-    default: {
-      classTest1: 0,
-      midTerm: 0,
-      classTest2: 0,
-      finalTerm: 0,
-    },
+    default: {},
   },
   grade: {
     type: String,
     enum: Grade,
-    default: null,
+    default: 'NA',
   },
   gradePoints: {
     type: Number,
-    default: 0,
     min: 0,
     max: 4,
+    default: 0,
   },
   isCompleted: {
     type: Boolean,
@@ -108,7 +103,7 @@ const enrolledCourseSchema = new Schema<TEnrolledCourse>({
   },
 });
 
-const EnrolledCourse = model<TEnrolledCourse>(
+const EnrolledCourse = mongoose.model<TEnrolledCourse>(
   'EnrolledCourse',
   enrolledCourseSchema,
 );

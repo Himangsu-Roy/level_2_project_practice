@@ -1,12 +1,11 @@
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
-import { EnrolledCourseService } from './enrolledCourse.service';
+import { EnrolledCourseServices } from './enrolledCourse.service';
 
 const createEnrolledCourse = catchAsync(async (req, res) => {
   const userId = req.user.userId;
-
-  const result = await EnrolledCourseService.createEnrolledCourseIntoDB(
+  const result = await EnrolledCourseServices.createEnrolledCourseIntoDB(
     userId,
     req.body,
   );
@@ -14,15 +13,14 @@ const createEnrolledCourse = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Enrolled Course created successfully',
+    message: 'Student is enrolled succesfully',
     data: result,
   });
 });
 
 const updateEnrolledCourseMarks = catchAsync(async (req, res) => {
   const facultyId = req.user.userId;
-
-  const result = await EnrolledCourseService.updateEnrolldedCourseMarksIntoDB(
+  const result = await EnrolledCourseServices.updateEnrolledCourseMarksIntoDB(
     facultyId,
     req.body,
   );
@@ -30,12 +28,12 @@ const updateEnrolledCourseMarks = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Enrolled Course marks updated successfully',
+    message: 'Marks is updated succesfully',
     data: result,
   });
 });
 
-export const EnrolledCourseController = {
+export const EnrolledCourseControllers = {
   createEnrolledCourse,
   updateEnrolledCourseMarks,
 };

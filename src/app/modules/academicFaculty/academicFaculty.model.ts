@@ -11,7 +11,6 @@ const academicFacultySchema = new Schema<TAcademicFaculty>(
   },
   {
     timestamps: true,
-    versionKey: false,
   },
 );
 
@@ -19,5 +18,3 @@ export const AcademicFaculty = model<TAcademicFaculty>(
   'AcademicFaculty',
   academicFacultySchema,
 );
-
-export default AcademicFaculty;
