@@ -17,7 +17,7 @@ router.post(
 );
 
 router.get(
-  '/:courseId',
+  '/:semesterId',
   auth(
     USER_ROLE.admin,
     USER_ROLE.faculty,
@@ -28,7 +28,7 @@ router.get(
 );
 
 router.patch(
-  '/:courseId',
+  '/:semesterId',
   auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(
     AcademicSemesterValidations.updateAcademicSemesterValidationSchema,

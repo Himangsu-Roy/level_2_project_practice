@@ -147,7 +147,15 @@ const getAllOfferedCoursesFromDB = async (query: Record<string, unknown>) => {
   };
 };
 
-const getMyOfferedCoursesFromDB = async (userId: string) => {
+const getMyOfferedCoursesFromDB = async (
+  userId: string,
+  query: Record<string, unknown>,
+) => {
+  // pagination setup
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const skip = (page - 1) * limit;
+
   const student = await Student.findOne({ id: userId });
 
   // find the student
@@ -164,12 +172,12 @@ const getMyOfferedCoursesFromDB = async (userId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'No ongoing semester found !');
   }
 
-  const result = await OfferedCourse.aggregate([
+  const aggregationQuery = [
     {
       $match: {
         semesterRegistration: currentOngoingSemester?._id,
-        // academicDepartment: student.academicDepartment,
-        // academicFaculty: student.academicFaculty,
+        academicDepartment: student.academicDepartment,
+        academicFaculty: student.academicFaculty,
       },
     },
     {
@@ -210,10 +218,57 @@ const getMyOfferedCoursesFromDB = async (userId: string) => {
       },
     },
     {
+      $lookup: {
+        from: 'enrolledcourses',
+        let: { currentStudent: student._id },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  {
+                    $eq: ['$student', '$$currentStudent'],
+                  },
+                  {
+                    $eq: ['$isCompleted', true],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+        as: 'completedCourses',
+      },
+    },
+    {
       $addFields: {
+        completedCourseIds: {
+          $map: {
+            input: '$completedCourses',
+            as: 'completed',
+            in: '$$completed.course',
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        isPreRequisitesFultilled: {
+          $or: [
+            {
+              $eq: ['$course.preRequisitesCourses', []],
+            },
+            {
+              $setIsSubset: [
+                '$course.preRequisitesCourses.course',
+                '$completedCourseIds',
+              ],
+            },
+          ],
+        },
         isAlreadyEnrolled: {
           $in: [
-            'course._id',
+            '$course._id',
             {
               $map: {
                 input: '$enrolledCourses',
@@ -228,11 +283,37 @@ const getMyOfferedCoursesFromDB = async (userId: string) => {
     {
       $match: {
         isAlreadyEnrolled: false,
+        isPreRequisitesFultilled: true,
       },
     },
+  ];
+
+  const paginationQuery = [
+    {
+      $skip: skip,
+    },
+    {
+      $limit: limit,
+    },
+  ];
+
+  const result = await OfferedCourse.aggregate([
+    ...aggregationQuery,
+    ...paginationQuery,
   ]);
 
-  return result;
+  const total = (await OfferedCourse.aggregate(aggregationQuery)).length;
+  const totalPages = Math.ceil(result.length / limit);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages,
+    },
+    result,
+  };
 };
 
 const getSingleOfferedCourseFromDB = async (id: string) => {
@@ -311,7 +392,7 @@ const updateOfferedCourseIntoDB = async (
 };
 
 const deleteOfferedCourseFromDB = async (id: string) => {
-  /**
+  /*
    * Step 1: check if the offered course exists
    * Step 2: check if the semester registration status is upcoming
    * Step 3: delete the offered course
